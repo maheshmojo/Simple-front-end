@@ -12,10 +12,13 @@ COPY ./ /usr/local/app/
 # Generate the build of the application
 RUN npm run build
 
+CMD ["npm", "start"]
+
 # Stage 2: Serve app with nginx server
 
 # Use official nginx image as the base image
 FROM nginx:latest
 
 # Copy the build output to replace the default nginx contents.
+COPY src/nginx/etc/conf.d/default.conf /etc/nginx/conf/default.conf
 COPY --from=build /usr/local/app/dist/angular8-crud-demo /usr/share/nginx/html
