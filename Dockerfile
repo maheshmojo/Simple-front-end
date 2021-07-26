@@ -12,7 +12,7 @@ COPY ./ /usr/local/app/
 # Generate the build of the application
 RUN npm run build
 
-CMD ["npm", "start"]
+#CMD ["npm", "start"]
 
 # Stage 2: Serve app with nginx server
 
