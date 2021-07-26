@@ -6,11 +6,11 @@ pipeline {
         nodejs "nodejs"
     }
     stages {
-        stage('Checkout SCM') {
-            steps {
-              git branch: 'Master-main', url: 'https://github.com/maheshmojo/Simple-front-end.git'
-            }
-        }
+        //stage('Checkout SCM') {
+        //    steps {
+        //      git branch: 'Master-main', url: 'https://github.com/maheshmojo/Simple-front-end.git'
+        //    }
+        // }
         stage('Build') {
             steps {
              bat "npm install"
