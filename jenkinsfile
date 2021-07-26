@@ -33,7 +33,7 @@ pipeline {
         }
         stage('Build Dockerimage') {
             steps {
-               bat "docker build --rm -t front-end-app/DEV ."
+               bat "docker build --rm -t front-end-app/dev1.0 ."
                
                
             }
@@ -41,7 +41,7 @@ pipeline {
         stage('Tag Dockerimage') {
             steps {
                 
-              bat "docker tag front-end-app 192.168.33.10:8123/front-end-app:DEV1.0${env.BUILD_ID}"
+              bat "docker tag front-end-app 192.168.33.10:8123/front-end-app:dev1.0${env.BUILD_ID}"
             
             }       
             
@@ -51,7 +51,7 @@ pipeline {
             steps {
                 
               bat"docker login -u docker -p admin@123 192.168.33.10:8123"
-              bat "docker push 192.168.33.10:8123/front-end-app:DEV1.0${env.BUILD_ID}" 
+              bat "docker push 192.168.33.10:8123/front-end-app:dev1.0${env.BUILD_ID}" 
             }       
             
     
@@ -63,9 +63,9 @@ pipeline {
              steps{
                 sh """#!/bin/bash 
 				
-				sudo docker container rm -f front-end-app/DEV
-				sudo docker pull 192.168.33.10:8123/front-end-app:DEV1.0${env.BUILD_ID}
-				sudo docker run --name front-end-app/DEV -p 4200:80 --network user-mysql --link simple-back-end -d 192.168.33.10:8123/front-end-app:DEV1.0${env.BUILD_ID}
+				sudo docker container rm -f front-end-app/dev1.0
+				sudo docker pull 192.168.33.10:8123/front-end-app:dev1.0${env.BUILD_ID}
+				sudo docker run --name front-end-app/dev1.0 -p 4200:80 --network user-mysql --link simple-back-end -d 192.168.33.10:8123/front-end-app:dev1.0${env.BUILD_ID}
 				
 				""" 
              }
