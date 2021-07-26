@@ -15,8 +15,8 @@ RUN npm run build
 # Stage 2: Serve app with nginx server
 
 # Use official nginx image as the base image
-FROM nginx:latest
+FROM nginx:alpine
 
 # Copy the build output to replace the default nginx contents.
 COPY src/nginx/etc/conf.d/default.conf /etc/nginx/conf/default.conf
-COPY --from=builder app/dist/angular8-crud-demo usr/share/nginx/html
+COPY --from=build app/dist/angular8-crud-demo usr/share/nginx/html
