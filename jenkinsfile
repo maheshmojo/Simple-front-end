@@ -58,7 +58,7 @@ pipeline {
          }
          stage('Pull from docker and run'){
              agent{
-                 label 'DEVELOPEMENT-SERVER'
+                 label 'DEVELOPMENT_SERVER'
              }
              steps{
                 sh """#!/bin/bash 
