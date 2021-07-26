@@ -11,21 +11,21 @@ pipeline {
               git branch: 'Master-main', url: 'https://github.com/maheshmojo/Simple-front-end.git'
             }
         }
-        stage('Build') {
-            steps {
-             bat "npm install"
-            }
-        }
-        stage('Install sonar scanner') {
-            steps {
-             bat "npm install --save-dev sonar-scanner"
-            }
-        }
-        stage('Run sonar scanner'){
-            steps{
-                bat "npm run sonar"
-            }
-        }
+       // stage('Build') {
+         //   steps {
+           //  bat "npm install"
+            //}
+        //}
+        //stage('Install sonar scanner') {
+          //  steps {
+            // bat "npm install --save-dev sonar-scanner"
+            //}
+        //}
+        //stage('Run sonar scanner'){
+          //  steps{
+            //    bat "npm run sonar"
+            //}
+        //}
         // stage('Deploy to Directory dist/'){
         //     steps{
         //         bat "npm run build"
