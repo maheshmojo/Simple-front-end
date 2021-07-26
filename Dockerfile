@@ -1,22 +1,15 @@
-# Stage 1: Compile and Build angular codebase
+FROM node:latest as builder
 
-# Use official node image as the base image
-FROM node:latest as build
+RUN mkdir -p /app
 
-# Set the working directory
-WORKDIR /usr/local/app
+WORKDIR /app
 
-# Add the source code to app
-COPY ./ /usr/local/app/
+COPY . .
 
-# Generate the build of the application
-RUN npm run build
+RUN npm run build --prod
 
-# Stage 2: Serve app with nginx server
+CMD ["npm", "start"]
 
-# Use official nginx image as the base image
 FROM nginx:alpine
-
-# Copy the build output to replace the default nginx contents.
 COPY src/nginx/etc/conf.d/default.conf /etc/nginx/conf/default.conf
-COPY --from=build app/dist/angular8-crud-demo usr/share/nginx/html
+COPY --from=builder app/dist/angular8-crud-demo usr/share/nginx/html
