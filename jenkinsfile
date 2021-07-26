@@ -5,21 +5,27 @@ pipeline {
     tools{
         nodejs "nodejs"
     }
-    stage('Build') {
+    stages {
+        stage('Checkout SCM') {
+            steps {
+              git branch: 'Master-main', url: 'https://github.com/maheshmojo/Simple-front-end.git'
+            }
+        }
+        stage('Build') {
             steps {
              bat "npm install"
             }
         }
-        // stage('Install sonar scanner') {
-        //     steps {
-        //      bat "npm install --save-dev sonar-scanner"
-        //     }
-        // }
-        // stage('Run sonar scanner'){
-        //     steps{
-        //         bat "npm run sonar"
-        //     }
-        // }
+        stage('Install sonar scanner') {
+            steps {
+             bat "npm install --save-dev sonar-scanner"
+            }
+        }
+        stage('Run sonar scanner'){
+            steps{
+                bat "npm run sonar"
+            }
+        }
         // stage('Deploy to Directory dist/'){
         //     steps{
         //         bat "npm run build"
@@ -35,7 +41,7 @@ pipeline {
         stage('Tag Dockerimage') {
             steps {
                 
-              bat "docker tag front-end-app 192.168.33.10:8123/front-end-app:${env.BUILD_ID}"
+              bat "docker tag front-end-app 192.168.33.10:8123/front-end-app:DEV${env.BUILD_ID}"
             
             }       
             
@@ -45,21 +51,21 @@ pipeline {
             steps {
                 
               bat"docker login -u docker -p admin@123 192.168.33.10:8123"
-              bat "docker push 192.168.33.10:8123/front-end-app:${env.BUILD_ID}" 
+              bat "docker push 192.168.33.10:8123/front-end-app:DEV${env.BUILD_ID}" 
             }       
             
     
          }
          stage('Pull from docker and run'){
              agent{
-                 label 'Master-Production-Node'
+                 label 'DEVELOPMENT_SERVER'
              }
              steps{
                 sh """#!/bin/bash 
 				
 				sudo docker container rm -f front-end-app
-				sudo docker pull 192.168.33.10:8123/front-end-app:${env.BUILD_ID}
-				sudo docker run --name front-end-app -p 4200:80 --network user-mysql --link simple-back-end -d 192.168.33.10:8123/front-end-app:${env.BUILD_ID}
+				sudo docker pull 192.168.33.10:8123/front-end-app:DEV${env.BUILD_ID}
+				sudo docker run --name front-end-app -p 4200:80 --network user-mysql --link simple-back-end -d 192.168.33.10:8123/front-end-app:DEV${env.BUILD_ID}
 				
 				""" 
              }
