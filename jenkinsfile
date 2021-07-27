@@ -16,16 +16,16 @@ pipeline {
              bat "npm install"
             }
         }
-        // stage('Install sonar scanner') {
-        //     steps {
-        //      bat "npm install --save-dev sonar-scanner"
-        //     }
-        // }
-        // stage('Run sonar scanner'){
-        //     steps{
-        //         bat "npm run sonar"
-        //     }
-        // }
+         stage('Install sonar scanner') {
+             steps {
+              bat "npm install --save-dev sonar-scanner"
+             }
+         }
+         stage('Run sonar scanner'){
+             steps{
+                 bat "npm run sonar"
+             }
+         }
         stage('Deploy to Directory dist/'){
             steps{
                 bat "npm run build"
