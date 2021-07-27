@@ -41,7 +41,7 @@ pipeline {
         stage('Tag Dockerimage') {
             steps {
                 
-              bat "docker tag front-end-app 192.168.33.10:8123/front-end-app:DEV${env.BUILD_ID}"
+              bat "docker tag front-end-app 192.168.33.10:8123/front-end-app:master${env.BUILD_ID}"
             
             }       
             
@@ -51,7 +51,7 @@ pipeline {
             steps {
                 
               bat"docker login -u docker -p admin@123 192.168.33.10:8123"
-              bat "docker push 192.168.33.10:8123/front-end-app:DEV${env.BUILD_ID}" 
+              bat "docker push 192.168.33.10:8123/front-end-app:master${env.BUILD_ID}" 
             }       
             
     
@@ -64,8 +64,8 @@ pipeline {
                 sh """#!/bin/bash 
 				
 				sudo docker container rm -f front-end-app
-				sudo docker pull 192.168.33.10:8123/front-end-app:DEV${env.BUILD_ID}
-				sudo docker run --name front-end-app -p 4200:80 --network user-mysql --link simple-back-end -d 192.168.33.10:8123/front-end-app:DEV${env.BUILD_ID}
+				sudo docker pull 192.168.33.10:8123/front-end-app:master${env.BUILD_ID}
+				sudo docker run --name front-end-app -p 4200:80 --network user-mysql --link simple-back-end -d 192.168.33.10:8123/front-end-app:master${env.BUILD_ID}
 				
 				""" 
              }
