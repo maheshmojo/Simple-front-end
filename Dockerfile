@@ -10,6 +10,7 @@ WORKDIR /usr/local/app
 COPY ./ /usr/local/app/
 
 # Generate the build of the application
+RUN npm run install
 RUN npm run build
 
 # Stage 2: Serve app with nginx server
