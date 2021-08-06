@@ -2,13 +2,12 @@ pipeline {
     agent none
 
     stages {
-        stage("Stage for Master-Production") {
+        stage("build and test the project") {
             agent {
                 label 'Master-Production'
             }
             tools {
-                
-                 nodejs "nodejs"
+                nodejs "nodejs"
             }
             stages {
                stage("Checkout SCM For Master-Production") {
@@ -19,12 +18,14 @@ pipeline {
                }
                stage("Build") {
                    steps {
-                        sh 'npm install'
-                        sh 'npm run build'
+                        // sh 'npm install'
+                        // sh 'npm run build'
+                        // sh 'npm install --save-dev sonar-scanner'
+                        // sh 'npm run sonar'
                         sh 'docker build -t simple-front-end-app:${BUILD_ID} .'
                    }
                }
-               stage("Push to Docker Registry") {
+               stage("Build to Docker Registry") {
                    steps {
                         sh 'sudo docker tag simple-front-end-app:${BUILD_ID} 192.168.33.10:8123/front-end-app:MASTER${BUILD_ID}'
                         sh 'sudo docker push 192.168.33.10:8123/front-end-app:MASTER${BUILD_ID}'
@@ -34,13 +35,13 @@ pipeline {
                stage("Run the container") {
                    steps {
                       sh 'sudo docker container rm -f simple-front-end-app'
-                      sh 'sudo docker container run -p 4200:80 --name simple-front-end-app --network user-mysql --link simple-back-end -d simple-front-end-app:${BUILD_ID}'
+                      sh 'sudo docker container run -p 4200:80 --name simple-front-end-app -d simple-front-end-app:${BUILD_ID}'
                    }
                 }
             }
         }
 
-        stage("Stage for DEVELOPMENT_SERVER") {
+        stage("DEVELOPMENT_SERVER") {
             agent {
                 label 'DEVELOPMENT_SERVER'
             }
@@ -50,13 +51,15 @@ pipeline {
             steps {
                 // Get the code from a GitHub repository
                      git branch: 'DEV', url: 'https://github.com/maheshmojo/Simple-front-end.git'
-                     sh 'npm install'
-                     sh 'npm run build'
+                    //  sh 'npm install'
+                    //  sh 'npm run build'
+                    //  sh 'npm install --save-dev sonar-scanner'
+                    //  sh 'npm run sonar'
                      sh 'docker build -t simple-front-end-app:${BUILD_ID} .'
                      sh 'sudo docker tag simple-front-end-app:${BUILD_ID} 192.168.33.10:8123/front-end-app:DEV${BUILD_ID}'
                      sh 'sudo docker push 192.168.33.10:8123/front-end-app:DEV${BUILD_ID}'
                      sh 'sudo docker container rm -f simple-front-end-app'
-                     sh 'sudo docker container run -p 4200:80 --name simple-front-end-app --network user-mysql --link simple-back-end -d simple-front-end-app:${BUILD_ID}'
+                     sh 'sudo docker container run -p 4200:80 --name simple-front-end-app -d simple-front-end-app:${BUILD_ID}'
             }
         }
     }
