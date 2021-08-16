@@ -1,66 +1,48 @@
-pipeline {
-    agent none
-
-    stages {
-        stage("build and test the project") {
+pipeline{
             agent {
-                label 'Master-Production'
+                label 'master'
             }
             tools {
                 nodejs "nodejs"
             }
-            stages {
-               stage("Checkout SCM For Master-Production") {
-                   steps {
-                      git branch: 'Master-main', url: 'https://github.com/maheshmojo/Simple-front-end.git'
-                      
-                   }
-               }
-               stage("Build") {
-                   steps {
-                        // sh 'npm install'
-                        // sh 'npm run build'
-                        // sh 'npm install --save-dev sonar-scanner'
-                        // sh 'npm run sonar'
-                        sh 'docker build -t simple-front-end-app:${BUILD_ID} .'
-                   }
-               }
-               stage("Build to Docker Registry") {
-                   steps {
-                        sh 'sudo docker tag simple-front-end-app:${BUILD_ID} 192.168.33.10:8123/front-end-app:MASTER${BUILD_ID}'
-                        sh 'sudo docker push 192.168.33.10:8123/front-end-app:MASTER${BUILD_ID}'
-                      
-                   }
-               }
-               stage("Run the container") {
-                   steps {
-                      sh 'sudo docker container rm -f simple-front-end-app'
-                      sh 'sudo docker container run -p 4200:80 --name simple-front-end-app -d simple-front-end-app:${BUILD_ID}'
-                   }
+            stages{
+                stage("Checkout from SCM"){
+                    steps{
+                        git branch: 'DEV', url: 'https://github.com/maheshmojo/Simple-front-end.git'
+                    }
+                }
+                stage("Build Stage"){
+                    steps{
+                         bat "npm install"
+                         bat "docker build --rm -t front-end-app-dev ."
+                    }
+                }
+                stage("Code Quality Checks"){
+                    steps{
+                        bat "npm install --save-dev sonar-scanner"
+                        bat "npm run sonar"
+                        bat "npm run build"
+                }
+                stage("Upload artifact image to nexus repositry"){
+                    steps{
+                       bat "docker tag front-end-app-dev 192.168.33.10:8123/front-end-app:DEV${env.BUILD_ID}"
+                       bat "docker login -u docker -p admin@123 192.168.33.10:8123"
+                       bat "docker push 192.168.33.10:8123/front-end-app:DEV${env.BUILD_ID}"
+                    }
+                }
+                stage("Deploy To DEV-SERVER"){
+                    agent{
+                        label 'DEVELOPMENT_SERVER'
+                    }
+                    steps{
+                        sh """#!/bin/bash 
+				
+				sudo docker container rm -f front-end-app
+				sudo docker pull 192.168.33.10:8123/front-end-app:DEV${env.BUILD_ID}
+				sudo docker run --name front-end-app -p 4200:80 --link simple-back-end -d 192.168.33.10:8123/front-end-app:DEV${env.BUILD_ID}
+				
+				"""
+                    }
                 }
             }
         }
-
-        stage("DEVELOPMENT_SERVER") {
-            agent {
-                label 'DEVELOPMENT_SERVER'
-            }
-            tools {
-                 nodejs "nodejs"
-            }
-            steps {
-                // Get the code from a GitHub repository
-                     git branch: 'DEV', url: 'https://github.com/maheshmojo/Simple-front-end.git'
-                    //  sh 'npm install'
-                    //  sh 'npm run build'
-                    //  sh 'npm install --save-dev sonar-scanner'
-                    //  sh 'npm run sonar'
-                     sh 'docker build -t simple-front-end-app:${BUILD_ID} .'
-                     sh 'sudo docker tag simple-front-end-app:${BUILD_ID} 192.168.33.10:8123/front-end-app:DEV${BUILD_ID}'
-                     sh 'sudo docker push 192.168.33.10:8123/front-end-app:DEV${BUILD_ID}'
-                     sh 'sudo docker container rm -f simple-front-end-app'
-                     sh 'sudo docker container run -p 4200:80 --name simple-front-end-app -d simple-front-end-app:${BUILD_ID}'
-            }
-        }
-    }
-}
