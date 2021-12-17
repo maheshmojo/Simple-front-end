@@ -1,7 +1,5 @@
 pipeline{
-
             agent {
-
                 label 'master'
             }
             tools {
@@ -10,17 +8,13 @@ pipeline{
             stages{
                 stage("Checkout from SCM"){
                     steps{
-
                         git branch: 'DEV', url: 'https://github.com/maheshmojo/Simple-front-end.git'
-
                     }
                 }
                 stage("Build Stage"){
                     steps{
-
                          bat "npm install"
                          bat "docker build --rm -t front-end-app-dev ."
-
                     }
                 }
                 stage("Code Quality Checks"){
@@ -28,7 +22,6 @@ pipeline{
                         bat "npm install --save-dev sonar-scanner"
                         bat "npm run sonar"
                         bat "npm run build"
-
                 }
                 stage("Upload artifact image to nexus repositry"){
                     steps{
@@ -40,20 +33,16 @@ pipeline{
                 stage("Deploy To DEV-SERVER"){
                     agent{
                         label 'DEVELOPMENT_SERVER'
-
                     }
                     steps{
                         sh """#!/bin/bash 
 				
 				sudo docker container rm -f front-end-app
-
 				sudo docker pull 192.168.33.10:8123/front-end-app:DEV${env.BUILD_ID}
 				sudo docker run --name front-end-app -p 4200:80 --link simple-back-end -d 192.168.33.10:8123/front-end-app:DEV${env.BUILD_ID}
-
 				
 				"""
                     }
                 }
             }
-
         }
