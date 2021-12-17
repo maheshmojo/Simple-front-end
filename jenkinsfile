@@ -1,5 +1,7 @@
 pipeline{
-            agent{
+
+            agent {
+
                 label 'master'
             }
             tools {
@@ -8,13 +10,17 @@ pipeline{
             stages{
                 stage("Checkout from SCM"){
                     steps{
-                        git branch: 'QA', url: 'https://github.com/maheshmojo/Simple-front-end.git'
+
+                        git branch: 'DEV', url: 'https://github.com/maheshmojo/Simple-front-end.git'
+
                     }
                 }
                 stage("Build Stage"){
                     steps{
-                        bat "npm install"
-                         bat "docker build --rm -t front-end-app-qa ."
+
+                         bat "npm install"
+                         bat "docker build --rm -t front-end-app-dev ."
+
                     }
                 }
                 stage("Code Quality Checks"){
@@ -22,29 +28,32 @@ pipeline{
                         bat "npm install --save-dev sonar-scanner"
                         bat "npm run sonar"
                         bat "npm run build"
-                    }
+
                 }
                 stage("Upload artifact image to nexus repositry"){
                     steps{
-                       bat "docker tag front-end-app-qa 192.168.33.10:8123/front-end-app:QA${env.BUILD_ID}"
+                       bat "docker tag front-end-app-dev 192.168.33.10:8123/front-end-app:DEV${env.BUILD_ID}"
                        bat "docker login -u docker -p admin@123 192.168.33.10:8123"
-                       bat "docker push 192.168.33.10:8123/front-end-app:QA${env.BUILD_ID}"
+                       bat "docker push 192.168.33.10:8123/front-end-app:DEV${env.BUILD_ID}"
                     }
                 }
-                stage("Deploy To QA-SERVER"){
+                stage("Deploy To DEV-SERVER"){
                     agent{
-                        label 'QA-SERVER'
+                        label 'DEVELOPMENT_SERVER'
+
                     }
                     steps{
                         sh """#!/bin/bash 
 				
 				sudo docker container rm -f front-end-app
-				sudo docker pull 192.168.33.10:8123/front-end-app:QA${env.BUILD_ID}
-				sudo docker run --name front-end-app -p 4200:80 --link simple-back-end -d 192.168.33.10:8123/front-end-app:QA${env.BUILD_ID}
+
+				sudo docker pull 192.168.33.10:8123/front-end-app:DEV${env.BUILD_ID}
+				sudo docker run --name front-end-app -p 4200:80 --link simple-back-end -d 192.168.33.10:8123/front-end-app:DEV${env.BUILD_ID}
+
 				
 				"""
                     }
                 }
             }
-           
+
         }
