@@ -1,4 +1,4 @@
-stage{
+pipeline{
             agent{
                 label 'master'
             }
